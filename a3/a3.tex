@@ -74,8 +74,11 @@ Using our standard supervised learning notation ($X$, $y$, $w$)
 \ask{express the following functions in terms of vectors, matrices, and norms} (there should be no summations or maximums).
 \begin{enumerate}
 \item $\left(\sum_{i=1}^n |w^Tx_i - y_i|\right)^2$.
+\ans{||Xw - y||^2 1}
 \item $\sum_{i=1}^n v_i(w^Tx_i  - y_i)^2 + \frac{\lambda}{2}\sum_{j=1}^d w_j^2$. This is regularized least squares with a \emph{weight} $v_i$ for each training example:  Hint: You can use $V$ to denote a diagonal matrix that has the values $v_i$ along the diagonal. What does $a^T V b$ look like in summation form (for some arbitrary vectors $a$, $b$)?
+\ans{if r = Xw - y, then r^T VR, so the answer is (Xw-y)^T * V(Xw - y) + \lambda * w^T * w}
 \item $\max_{i \in \{1,2,\dots,n\}}  |w^Tx_i - y_i| +  \frac12 \sum_{j=1}^{d} \lambda_j|w_j|$. This is L1-regularized brittle regression with a different regularization strength for each dimension: Hint: You can use  $\Lambda$ to denote a diagonal matrix that has the $\lambda_j$ values along the diagonal.
+\ans{||Xw-y||\infinity + 1/2||Aw||1}
 \end{enumerate}
 
 Note: you can assume that all the $v_i$ and $\lambda_i$ values are non-negative.
@@ -85,9 +88,13 @@ Note: you can assume that all the $v_i$ and $\lambda_i$ values are non-negative.
 \ask{Write finding a minimizer $w$ of the functions below as a system of linear equations} (using vector/matrix notation and simplifying as much as possible). Note that all the functions below are convex, so finding a $w$ with $\nabla f(w) = 0$ is sufficient to minimize the functions -- but show your work in getting to this point.
 
 \begin{enumerate}
+(Aw = b)
 \item $f(w) = \frac{1}{2} \norm{w-v}^2$ (projection of $v$ onto real space).
+\ans{Iw = v}
 \item $f(w)= \frac{1}{2} \norm{Xw - y}^2 + \frac{1}{2} w^T\Lambda w$ (least squares with weighted regularization).
+\ans{X^T * Xw +Aw = X^T * y}
 \item $f(w) = \frac{1}{2} \sum_{i=1}^n v_i (w^Tx_i - y_i)^2 + \frac{\lambda}{2}\norm{w-w^{(0)}}^2$ (weighted least squares shrunk towards non-zero $w^{(0)}$). \label{item:weighted-shrunk-ls}
+\ans{(X^T * VX + \lambda * I)w = X^T * Vy + \lambda w^(0)}
 \end{enumerate}
 Above we assume that $v$ and $w^{(0)}$ are $d \times 1$ vectors, and $\Lambda$ is a $d \times d$ diagonal matrix (with positive entries along the diagonal). You can use $V$ as a diagonal matrix containing the $v_i$ values along the diagonal.
 
