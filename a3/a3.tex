@@ -149,6 +149,28 @@ Apply this model to the data containing outliers, setting $v = 1$ for the first
 $400$ data points and $v = 0.1$ for the last $100$ data points (which are the outliers).
 \ask{Hand in your code and the updated plot}.
 
+\ans{
+	\begin{minted}{python}
+		# Least squares where each sample point X has a weight associated with it.
+		class WeightedLeastSquares(LeastSquares):
+    		# inherits the predict() function from LeastSquares
+    		def fit(self, X, y, v):
+       		 # """YOUR CODE HERE FOR Q2.1"""
+       		 # raise NotImplementedError()
+        
+        		#take the square root of v
+        		sqrt_v = np.sqrt(v)
+
+        		#get weighted versions of X, and y
+        		weighted_X = X * sqrt_v[:, None]
+        		weighted_y = y * sqrt_v[:, None]
+
+        		#solve weighted least squares
+        		self.w = np.linalg.lstsq(weighted_X, weighted_y, rcond=None)[0]
+	\end{minted}
+
+	{\centerfig{.61}{figs/Weighted_least_squares_outliers_Q2.1.pdf}}
+}
 
 \subsection{Smooth Approximation to the L1-Norm \pts{8}}
 
@@ -167,7 +189,12 @@ f(w) {=} \sum_{i=1}^n  \log\left(\exp(w^Tx_i - y_i) + \exp(y_i - w^Tx_i)\right).
 which is smooth but less sensitive to outliers than the squared error. \ask{Derive
  the gradient $\nabla f$ of this function with respect to $w$. You should show your work but you do \underline{not} have to express the final result in matrix notation.}
 
+ FIN THIS ONE LATER
+\ans{for \[f(w) {=} \sum_{i=1}^n  \log\left(\exp(w^Tx_i - y_i) + \exp(y_i - w^Tx_i)\right).\]
+r_i = w^Tx_i - y_i , r_i- = y_i - w^Tx_i so for one term the equation becomes f_i(w) = log(exp(r_i) + exp(r_i-))
 
+
+}
 
 \subsection{Gradient Descent: Understanding the Code \pts{5}}
 
@@ -179,9 +206,18 @@ Recall gradient descent, a derivative-based optimization algorithm that uses gra
 Look at the methods named \texttt{get\_learning\_rate\_and\_step()} and \texttt{break\_yes()}, and \ask{answer each of these questions, one sentence per answer:}
 \begin{enumerate}
 	\item Which variable is equivalent to $\alpha^t$, the step size at iteration $t$?
+	\ans{The varible that is equivalent to $\alpha^t$ in the step size at iteration $t$ is the varible $\alpha$}
+
 	\item Which variable is equivalent to $\nabla_w f(w^t)$ the current value of the gradient vector?
+	\ans{The varible that is equivalent to $\nabla_w f(w^t)$ in the current value of the gradient vector is the varible g_old}
+
 	\item Which variable is equivalent to $w^t$, the current value of the parameters?
+	\ans{The variable that is equivalent to $w^t$, within the current value of the parameters is w_old}
+
 	\item What is the method \texttt{break\_yes()} doing?
+	\ans{The method \texttt{break\_yes()} is checking whether the gradient is small enought to meet the optimality tolerance, weather the maximum num of evaluations is reached.
+	returns true if optimization needs to be stopped}
+
 \end{enumerate}
 
 
@@ -209,10 +245,46 @@ Optimizing robust regression parameters is the matter of implementing a function
 approximation to the absolute value function (from the previous section). Hand in your code, as well
 as the plot obtained using this robust regression approach.}
 
+\ans{
+	\begin{minted}{python}
+		class RobustRegressionLoss(FunObj):
+    		def evaluate(self, w, X, y):
+        		"""
+        		Evaluates the function and gradient of ROBUST least squares objective.
+        		"""
+        		# help avoid mistakes (as described in the assignment) by
+        		# potentially reshaping our arguments
+        		w = ensure_1d(w)
+        		y = ensure_1d(y)
+
+        		# """YOUR CODE HERE FOR Q2.3"""
+        		# raise NotImplementedError()
+
+        		#predictions, residuals
+        		resid = (X & w) - y
+
+        		#robust loss
+        		f_sum = np.sum(np.logaddexp(resid, -resid))
+
+        		#gradient
+        		gradient = X.T & np.tanh(resid)
+
+        		return f_sum, gradient
+	\end{minted}
+
+	{\centerfig{.61}{figs/Robust_Regression_Loss_Q2.4.pdf}}
+}
+
+
 \subsubsection{The Learning Curves \pts{5}}
 
 Using the same dataset as the previous sections, produce the plot of ``gradient descent learning curves'' to compare the performances of \texttt{GradientDescent} and \texttt{GradientDescentLineSearch} for robust regression, where \textbf{one hundred (100) iterations} of gradient descent are on the x-axis and the \textbf{objective function value} corresponding to each iteration is visualized on the y-axis (see gradient descent lecture). Use the default \texttt{learning\_rate} for \texttt{GradientDescent}. \ask{Submit this plot. According to this plot, which optimizer is more ``iteration-efficient''?}
 
+\ans{
+	{\centerfig{.61}{figs/Robust_Regression_Optimizer_Comparison_Q2.4.2.pdf}}
+
+	According to the figure the GradientDescentLineSearch is the more iteration efficient optimizer
+}
 
 
 \clearpage

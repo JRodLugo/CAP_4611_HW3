@@ -15,9 +15,18 @@ class LeastSquares:
 class WeightedLeastSquares(LeastSquares):
     # inherits the predict() function from LeastSquares
     def fit(self, X, y, v):
-        """YOUR CODE HERE FOR Q2.1"""
-        raise NotImplementedError()
+        # """YOUR CODE HERE FOR Q2.1"""
+        # raise NotImplementedError()
+        
+        #take the square root of v
+        sqrt_v = np.sqrt(v)
 
+        #get weighted versions of X, and y
+        weighted_X = X * sqrt_v[:, None]
+        weighted_y = y * sqrt_v[:, None]
+
+        #solve weighted least squares
+        self.w = np.linalg.lstsq(weighted_X, weighted_y, rcond=None)[0]
 
 class LinearModel:
     """

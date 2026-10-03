@@ -44,8 +44,18 @@ def q2_1():
     X = data["X"]
     y = data["y"].squeeze(1)
 
-    """YOUR CODE FOR Q2.1"""
-    raise NotImplementedError()
+    # """YOUR CODE FOR Q2.1"""
+    # raise NotImplementedError()
+    #makes the model, fits data
+    v = np.ones(len(y))
+    v[400:1] =0.1
+    model = WeightedLeastSquares()
+    model.fit(X,y,v)
+   
+    #makes plot
+    test_and_plot(
+            model, X, y, title="Weighted Least Squares", filename="Weighted_least_squares_outliers_Q2.1.pdf"
+        )
 
 
 @handle("2.4")
@@ -77,9 +87,21 @@ def q2_4_1():
     y = data["y"].squeeze(1)
 
     """YOUR CODE HERE FOR Q2.4.1"""
-    # TODO: Finish RobustRegressionLoss in fun_obj.py.
-    raise NotImplementedError()
-
+    # # TODO: Finish RobustRegressionLoss in fun_obj.py.
+    # raise NotImplementedError()
+    
+    #creates the loss,optimizer, and model
+    fun_opj = RobustRegressionLoss()
+    optimizer = GradientDescent()
+    model = LinearModel(fun_opj, optimizer)
+    model.fit(X,y)
+    test_and_plot(
+            model,
+            X,
+            y,
+            title="Robust Regression Loss",
+            filename="Robust_Regression_Loss_Q2.4.pdf",
+        )
 
 @handle("2.4.2")
 def q2_4_2():
@@ -88,16 +110,69 @@ def q2_4_2():
     X = data["X"]
     y = data["y"].squeeze(1)
 
-    # Produce the learning curves with
-    # 1. GradientDescent
-    # 2. GradientDescentLineSearch
-
+    # -------------------------
+    # Gradient Descent
+    # -------------------------
     fun_obj = RobustRegressionLoss()
-    optimizer = GradientDescent(max_evals=100, verbose=False)
-    model = LinearModel(fun_obj, optimizer)
-    model.fit(X, y)
-    """YOUR CODE HERE FOR Q2.4.2"""
-    raise NotImplementedError()
+
+    optimizer = GradientDescent(
+        max_evals=100,
+        verbose=False
+    )
+
+    model_gd = LinearModel(fun_obj, optimizer)
+    model_gd.fit(X, y)
+
+    # Store objective values
+    gd_values = model_gd.fs
+
+    # -------------------------
+    # Gradient Descent Line Search
+    # -------------------------
+    optimizer_ls = GradientDescentLineSearch(
+        max_evals=100,
+        verbose=False
+    )
+
+    model_ls = LinearModel(fun_obj, optimizer_ls)
+    model_ls.fit(X, y)
+
+    # Store objective values
+    ls_values = model_ls.fs
+
+    # -------------------------
+    # Plot learning curves
+    # -------------------------
+    iterations_gd = range(1, len(gd_values) + 1)
+    iterations_ls = range(1, len(ls_values) + 1)
+
+    plt.figure()
+
+    plt.plot(
+        iterations_gd,
+        gd_values,
+        label="GradientDescent"
+    )
+
+    plt.plot(
+        iterations_ls,
+        ls_values,
+        label="GradientDescentLineSearch"
+    )
+
+    plt.xlabel("Iteration")
+    plt.ylabel("Objective Function Value")
+    plt.title("Robust Regression: Optimizer Comparison")
+
+    plt.legend()
+
+    plt.savefig(
+        "Robust_Regression_Optimizer_Comparison_Q2.4.2.pdf"
+    )
+
+    plt.show()
+
+
 
 
 @handle("3")

@@ -84,5 +84,16 @@ class RobustRegressionLoss(FunObj):
         w = ensure_1d(w)
         y = ensure_1d(y)
 
-        """YOUR CODE HERE FOR Q2.3"""
-        raise NotImplementedError()
+        # """YOUR CODE HERE FOR Q2.3"""
+        # raise NotImplementedError()
+
+        #predictions, residuals
+        resid = (X & w) - y
+
+        #robust loss
+        f_sum = np.sum(np.logaddexp(resid, -resid))
+
+        #gradient
+        gradient = X.T & np.tanh(resid)
+
+        return f_sum, gradient
