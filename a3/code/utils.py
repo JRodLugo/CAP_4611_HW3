@@ -32,6 +32,8 @@ def test_and_plot(model, X, y, Xtest=None, ytest=None, title=None, filename=None
     Xgrid = np.linspace(np.min(X), np.max(X), 1000)[:, None]
     ygrid = model.predict(Xgrid)
     plt.plot(Xgrid, ygrid, color="r", lw=2)
+    plt.xlabel("Input x")
+    plt.ylabel("Target y")
 
     if title is not None:
         plt.title(title)

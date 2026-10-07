@@ -48,7 +48,7 @@ def q2_1():
     # raise NotImplementedError()
     #makes the model, fits data
     v = np.ones(len(y))
-    v[400:1] =0.1
+    v[400:] = 0.1
     model = WeightedLeastSquares()
     model.fit(X,y,v)
    
@@ -92,7 +92,7 @@ def q2_4_1():
     
     #creates the loss,optimizer, and model
     fun_opj = RobustRegressionLoss()
-    optimizer = GradientDescent()
+    optimizer = GradientDescentLineSearch()
     model = LinearModel(fun_opj, optimizer)
     model.fit(X,y)
     test_and_plot(
@@ -116,6 +116,7 @@ def q2_4_2():
     fun_obj = RobustRegressionLoss()
 
     optimizer = GradientDescent(
+        optimal_tolerance=0,
         max_evals=100,
         verbose=False
     )
@@ -130,6 +131,7 @@ def q2_4_2():
     # Gradient Descent Line Search
     # -------------------------
     optimizer_ls = GradientDescentLineSearch(
+        optimal_tolerance=0,
         max_evals=100,
         verbose=False
     )
@@ -143,8 +145,8 @@ def q2_4_2():
     # -------------------------
     # Plot learning curves
     # -------------------------
-    iterations_gd = range(1, len(gd_values) + 1)
-    iterations_ls = range(1, len(ls_values) + 1)
+    iterations_gd = range(len(gd_values))
+    iterations_ls = range(len(ls_values))
 
     plt.figure()
 
@@ -167,10 +169,10 @@ def q2_4_2():
     plt.legend()
 
     plt.savefig(
-        "Robust_Regression_Optimizer_Comparison_Q2.4.2.pdf"
+        Path("..", "figs", "Robust_Regression_Optimizer_Comparison_Q2.4.2.pdf")
     )
 
-    plt.show()
+    plt.close()
 
 
 
@@ -256,6 +258,7 @@ def q3_2():
         y_hat = model.predict(X_valid)
         err_valid = np.mean((y_hat - y_valid) ** 2)
         err_valids[i] = err_valid
+        print(f"Training MSE = {err_train:.6g}; validation MSE = {err_valid:.6g}")
 
         ax.scatter(X, y, color="b", s=2)
         Xgrid = np.linspace(np.min(X_valid), np.max(X_valid), 1000)[:, None]

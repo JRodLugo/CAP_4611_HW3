@@ -23,7 +23,7 @@ class WeightedLeastSquares(LeastSquares):
 
         #get weighted versions of X, and y
         weighted_X = X * sqrt_v[:, None]
-        weighted_y = y * sqrt_v[:, None]
+        weighted_y = np.asarray(y).reshape(-1) * sqrt_v
 
         #solve weighted least squares
         self.w = np.linalg.lstsq(weighted_X, weighted_y, rcond=None)[0]
@@ -117,12 +117,12 @@ class LeastSquaresBias:
     "Least Squares with a bias added"
 
     def fit(self, X, y):
-        """YOUR CODE HERE FOR Q3.1"""
-        raise NotImplementedError()
+        Z = np.column_stack((np.ones(X.shape[0]), X))
+        self.w = np.linalg.lstsq(Z, np.asarray(y).reshape(-1), rcond=None)[0]
 
     def predict(self, X_pred):
-        """YOUR CODE HERE FOR Q3.1"""
-        raise NotImplementedError()
+        Z = np.column_stack((np.ones(X_pred.shape[0]), X_pred))
+        return Z @ self.w
 
 
 class LeastSquaresPoly:
@@ -133,16 +133,15 @@ class LeastSquaresPoly:
         self.p = p
 
     def fit(self, X, y):
-        """YOUR CODE HERE FOR Q3.2"""
-        raise NotImplementedError()
+        Z = self._poly_basis(X)
+        self.w = np.linalg.lstsq(Z, np.asarray(y).reshape(-1), rcond=None)[0]
 
     def predict(self, X_pred):
-        """YOUR CODE HERE FOR Q3.2"""
-        raise NotImplementedError()
+        return self._poly_basis(X_pred) @ self.w
 
     # A private helper function to transform any X with d=1 into
     # the polynomial basis defined by this class at initialization.
     # Returns the matrix Z that is the polynomial basis of X.
     def _poly_basis(self, X):
-        """YOUR CODE HERE FOR Q3.2"""
-        raise NotImplementedError()
+        x = np.asarray(X).reshape(-1)
+        return x[:, None] ** np.arange(self.p + 1)[None, :]

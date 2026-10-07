@@ -88,12 +88,12 @@ class RobustRegressionLoss(FunObj):
         # raise NotImplementedError()
 
         #predictions, residuals
-        resid = (X & w) - y
+        resid = (X @ w) - y
 
         #robust loss
         f_sum = np.sum(np.logaddexp(resid, -resid))
 
         #gradient
-        gradient = X.T & np.tanh(resid)
+        gradient = X.T @ np.tanh(resid)
 
         return f_sum, gradient

@@ -48,11 +48,12 @@
 \begin{document}
 
 \title{CAP 4611 Assignment 3}
+\author{Name: \textbf{[enter full name]}\\Student number: \textbf{[enter student number]}}
 \date{}
 \maketitle
 
 
-\vspace{-4em}
+
 
 
 \section*{Important: Submission Format \pts{5}}
@@ -65,6 +66,8 @@
 \section{Matrix Notation and Minimizing Quadratics \pts{12}}
 
 \subsection{Converting to Matrix/Vector/Norm Notation \pts{6}}
+\par\textit{Source: OpenAI Codex assistance with derivation, implementation, and explanation (October 6, 2026); assignment data and starter code supplied by the course.}\par
+
 
 Using our standard supervised learning notation ($X$, $y$, $w$)
 \ask{express the following functions in terms of vectors, matrices, and norms} (there should be no summations or maximums).
@@ -72,25 +75,27 @@ Using our standard supervised learning notation ($X$, $y$, $w$)
 \item $\left(\sum_{i=1}^n |w^Tx_i - y_i|\right)^2$.
 \ans{$\lVert Xw - y\rVert_1^2$}
 \item $\sum_{i=1}^n v_i(w^Tx_i  - y_i)^2 + \frac{\lambda}{2}\sum_{j=1}^d w_j^2$. This is regularized least squares with a \emph{weight} $v_i$ for each training example:  Hint: You can use $V$ to denote a diagonal matrix that has the values $v_i$ along the diagonal. What does $a^T V b$ look like in summation form (for some arbitrary vectors $a$, $b$)?
-\ans{if $r = Xw - y$, then $r^T VR$, so the answer is $(Xw-y)^T * V(Xw - y) + \lambda * w^T * w$}
+\ans{$(Xw-y)^T V(Xw-y)+\frac{\lambda}{2}w^Tw$. Here $r^TVr=\sum_i v_i r_i^2$.}
 \item $\max_{i \in \{1,2,\dots,n\}}  |w^Tx_i - y_i| +  \frac12 \sum_{j=1}^{d} \lambda_j|w_j|$. This is L1-regularized brittle regression with a different regularization strength for each dimension: Hint: You can use  $\Lambda$ to denote a diagonal matrix that has the $\lambda_j$ values along the diagonal.
-\ans{$\lVert Xw-y\rVert_\infty + 1/2\lVert Aw\rVert_1$}
+\ans{$\lVert Xw-y\rVert_\infty + 1/2\lVert \Lambda w\rVert_1$}
 \end{enumerate}
 
 Note: you can assume that all the $v_i$ and $\lambda_i$ values are non-negative.
 
 \subsection{Minimizing Quadratic Functions as Linear Systems \pts{6}} \label{sec:lin-sys}
+\par\textit{Source: OpenAI Codex assistance with derivation, implementation, and explanation (October 6, 2026); assignment data and starter code supplied by the course.}\par
+
 
 \ask{Write finding a minimizer $w$ of the functions below as a system of linear equations} (using vector/matrix notation and simplifying as much as possible). Note that all the functions below are convex, so finding a $w$ with $\nabla f(w) = 0$ is sufficient to minimize the functions -- but show your work in getting to this point.
 
 \begin{enumerate}
-\item[] $(Aw = b)$
+
 \item $f(w) = \frac{1}{2} \norm{w-v}^2$ (projection of $v$ onto real space).
-\ans{$Iw = v$}
+\ans{$\nabla f(w)=w-v=0$, so $Iw=v$.}
 \item $f(w)= \frac{1}{2} \norm{Xw - y}^2 + \frac{1}{2} w^T\Lambda w$ (least squares with weighted regularization).
-\ans{$X^T * Xw +Aw = X^T * y$}
+\ans{$\nabla f(w)=X^T(Xw-y)+\Lambda w=0$, so $(X^TX+\Lambda)w=X^Ty$.}
 \item $f(w) = \frac{1}{2} \sum_{i=1}^n v_i (w^Tx_i - y_i)^2 + \frac{\lambda}{2}\norm{w-w^{(0)}}^2$ (weighted least squares shrunk towards non-zero $w^{(0)}$). \label{item:weighted-shrunk-ls}
-\ans{$(X^T * VX + \lambda * I)w = X^T * Vy + \lambda w^{(0)}$}
+\ans{$\nabla f(w)=X^TV(Xw-y)+\lambda(w-w^{(0)})=0$, so $(X^TVX+\lambda I)w=X^TVy+\lambda w^{(0)}$.}
 \end{enumerate}
 Above we assume that $v$ and $w^{(0)}$ are $d \times 1$ vectors, and $\Lambda$ is a $d \times d$ diagonal matrix (with positive entries along the diagonal). You can use $V$ as a diagonal matrix containing the $v_i$ values along the diagonal.
 
@@ -132,6 +137,8 @@ You can go from \texttt{(n,)} to \texttt{(n, 1)} with, for instance, \texttt{one
 (which says ``give me the whole first axis, then add another axis of length 1 in the second position'').
 
 \subsection{Weighted Least Squares in One Dimension \pts{8}}
+\par\textit{Source: OpenAI Codex assistance with derivation, implementation, and explanation (October 6, 2026); assignment data and starter code supplied by the course.}\par
+
 
 One of the most common variations on least squares is \emph{weighted} least squares. In this formulation, we have a weight $v_i$ for every training example. To fit the model, we minimize the weighted squared error,
 \[
@@ -146,29 +153,38 @@ $400$ data points and $v = 0.1$ for the last $100$ data points (which are the ou
 \ask{Hand in your code and the updated plot}.
 
 \begin{answer}
-	\begin{lstlisting}
-		# Least squares where each sample point X has a weight associated with it.
-		class WeightedLeastSquares(LeastSquares):
-    		# inherits the predict() function from LeastSquares
-    		def fit(self, X, y, v):
-       		 # """YOUR CODE HERE FOR Q2.1"""
-       		 # raise NotImplementedError()
+\begin{lstlisting}
+class WeightedLeastSquares(LeastSquares):
+    # inherits the predict() function from LeastSquares
+    def fit(self, X, y, v):
+        # """YOUR CODE HERE FOR Q2.1"""
+        # raise NotImplementedError()
         
-        		#take the square root of v
-        		sqrt_v = np.sqrt(v)
+        #take the square root of v
+        sqrt_v = np.sqrt(v)
 
-        		#get weighted versions of X, and y
-        		weighted_X = X * sqrt_v[:, None]
-        		weighted_y = y * sqrt_v[:, None]
+        #get weighted versions of X, and y
+        weighted_X = X * sqrt_v[:, None]
+        weighted_y = np.asarray(y).reshape(-1) * sqrt_v
 
-        		#solve weighted least squares
-        		self.w = np.linalg.lstsq(weighted_X, weighted_y, rcond=None)[0]
-	\end{lstlisting}
-
-	{\centerfig{.61}{figs/Weighted_least_squares_outliers_Q2.1.pdf}}
+        #solve weighted least squares
+        self.w = np.linalg.lstsq(weighted_X, weighted_y, rcond=None)[0]
+\end{lstlisting}
+\begin{lstlisting}
+v = np.ones(len(y))
+v[400:] = 0.1
+model = WeightedLeastSquares()
+model.fit(X, y, v)
+test_and_plot(model, X, y, title="Weighted Least Squares",
+              filename="Weighted_least_squares_outliers_Q2.1.pdf")
+\end{lstlisting}
+\centerfig{.7}{figs/Weighted_least_squares_outliers_Q2.1.pdf}
+The fitted slope is $w=-4.592700$. The unweighted training MSE is $40.8732$; it is slightly larger than ordinary least squares because the weighted model prioritizes the first 400 examples rather than the unweighted squared error over all 500 examples.
 \end{answer}
 
 \subsection{Smooth Approximation to the L1-Norm \pts{8}}
+\par\textit{Source: OpenAI Codex assistance with derivation, implementation, and explanation (October 6, 2026); assignment data and starter code supplied by the course.}\par
+
 
 Unfortunately, we typically do not know the identities of the outliers. In situations where we suspect that there are outliers, but we do not know which examples are outliers, it makes sense to use a loss function that is more robust to outliers. In class, we discussed using the sum of absolute values objective,
 \[
@@ -185,14 +201,24 @@ f(w) {=} \sum_{i=1}^n  \log\left(\exp(w^Tx_i - y_i) + \exp(y_i - w^Tx_i)\right).
 which is smooth but less sensitive to outliers than the squared error. \ask{Derive
  the gradient $\nabla f$ of this function with respect to $w$. You should show your work but you do \underline{not} have to express the final result in matrix notation.}
 
- FIN THIS ONE LATER
-\ans{for \[f(w) {=} \sum_{i=1}^n  \log\left(\exp(w^Tx_i - y_i) + \exp(y_i - w^Tx_i)\right).\]
-$r_i = w^Tx_i - y_i$, $r_i^- = y_i - w^Tx_i$ so for one term the equation becomes $f_i(w) = \log(\exp(r_i) + \exp(r_i^-))$
-
-
-}
+\begin{answer}
+Let $r_i=w^Tx_i-y_i$, so $\nabla_w r_i=x_i$. By the chain rule,
+\[
+\nabla_w\log(e^{r_i}+e^{-r_i})
+=\frac{e^{r_i}-e^{-r_i}}{e^{r_i}+e^{-r_i}}x_i
+=\tanh(r_i)x_i.
+\]
+Summing over examples gives
+\[
+\boxed{\nabla f(w)=\sum_{i=1}^n\tanh(w^Tx_i-y_i)x_i
+=X^T\tanh(Xw-y).}
+\]
+The hyperbolic tangent acts elementwise in the matrix expression.
+\end{answer}
 
 \subsection{Gradient Descent: Understanding the Code \pts{5}}
+\par\textit{Source: OpenAI Codex assistance with derivation, implementation, and explanation (October 6, 2026); assignment data and starter code supplied by the course.}\par
+
 
 Recall gradient descent, a derivative-based optimization algorithm that uses gradients to navigate the parameter space until a locally optimal parameter is found. In \texttt{optimizers.py}, you will see our implementation of gradient descent, taking the form of a class named \texttt{GradientDescent}. This class has a similar design pattern as PyTorch, a popular differentiable programming and optimization library. One step of gradient descent is defined as
 \[
@@ -235,6 +261,8 @@ previous section. The class \texttt{LinearModel} has most of the implementation
 of a gradient-based strategy for fitting the robust regression model under the log-sum-exp approximation.
 
 \subsubsection{Implementing the Objective Function \pts{15}}
+\par\textit{Source: OpenAI Codex assistance with derivation, implementation, and explanation (October 6, 2026); assignment data and starter code supplied by the course.}\par
+
 
 Optimizing robust regression parameters is the matter of implementing a function object and using an optimizer to minimize the function object. The only part missing is the function and gradient calculation inside \texttt{fun\_obj.py}.
 \ask{Inside \texttt{fun\_obj.py}, complete \texttt{RobustRegressionLoss} to implement the objective function and gradient based on the smooth
@@ -242,44 +270,137 @@ approximation to the absolute value function (from the previous section). Hand i
 as the plot obtained using this robust regression approach.}
 
 \begin{answer}
-	\begin{lstlisting}
-		class RobustRegressionLoss(FunObj):
-    		def evaluate(self, w, X, y):
-        		"""
-        		Evaluates the function and gradient of ROBUST least squares objective.
-        		"""
-        		# help avoid mistakes (as described in the assignment) by
-        		# potentially reshaping our arguments
-        		w = ensure_1d(w)
-        		y = ensure_1d(y)
+\begin{lstlisting}
+class RobustRegressionLoss(FunObj):
+    def evaluate(self, w, X, y):
+        """
+        Evaluates the function and gradient of ROBUST least squares objective.
+        """
+        # help avoid mistakes (as described in the assignment) by
+        # potentially reshaping our arguments
+        w = ensure_1d(w)
+        y = ensure_1d(y)
 
-        		# """YOUR CODE HERE FOR Q2.3"""
-        		# raise NotImplementedError()
+        # """YOUR CODE HERE FOR Q2.3"""
+        # raise NotImplementedError()
 
-        		#predictions, residuals
-        		resid = (X & w) - y
+        #predictions, residuals
+        resid = (X @ w) - y
 
-        		#robust loss
-        		f_sum = np.sum(np.logaddexp(resid, -resid))
+        #robust loss
+        f_sum = np.sum(np.logaddexp(resid, -resid))
 
-        		#gradient
-        		gradient = X.T & np.tanh(resid)
+        #gradient
+        gradient = X.T @ np.tanh(resid)
 
-        		return f_sum, gradient
-	\end{lstlisting}
-
-	{\centerfig{.61}{figs/Robust_Regression_GradientDescent_Q2.4.pdf}}
+        return f_sum, gradient
+\end{lstlisting}
+\begin{lstlisting}
+fun_obj = RobustRegressionLoss()
+optimizer = GradientDescentLineSearch()
+model = LinearModel(fun_obj, optimizer)
+model.fit(X, y)
+test_and_plot(model, X, y, title="Robust Regression",
+              filename="Robust_Regression_Loss_Q2.4.pdf")
+\end{lstlisting}
+\centerfig{.7}{figs/Robust_Regression_Loss_Q2.4.pdf}
+The unweighted training MSE is $40.6$ (rounded to one decimal place). This model minimizes the smooth robust objective rather than squared error. A finite-difference check agrees with the analytic gradient to absolute tolerance $10^{-3}$.
 \end{answer}
 
 
 \subsubsection{The Learning Curves \pts{5}}
+\par\textit{Source: OpenAI Codex assistance with derivation, implementation, and explanation (October 6, 2026); assignment data and starter code supplied by the course.}\par
+
 
 Using the same dataset as the previous sections, produce the plot of ``gradient descent learning curves'' to compare the performances of \texttt{GradientDescent} and \texttt{GradientDescentLineSearch} for robust regression, where \textbf{one hundred (100) iterations} of gradient descent are on the x-axis and the \textbf{objective function value} corresponding to each iteration is visualized on the y-axis (see gradient descent lecture). Use the default \texttt{learning\_rate} for \texttt{GradientDescent}. \ask{Submit this plot. According to this plot, which optimizer is more ``iteration-efficient''?}
 
+\begin{answer}
+\begin{lstlisting}
+def q2_4_2():
+    # loads the data in the form of dictionary
+    data = load_dataset("outliersData.pkl")
+    X = data["X"]
+    y = data["y"].squeeze(1)
+
+    # -------------------------
+    # Gradient Descent
+    # -------------------------
+    fun_obj = RobustRegressionLoss()
+
+    optimizer = GradientDescent(
+        optimal_tolerance=0,
+        max_evals=100,
+        verbose=False
+    )
+
+    model_gd = LinearModel(fun_obj, optimizer)
+    model_gd.fit(X, y)
+
+    # Store objective values
+    gd_values = model_gd.fs
+
+    # -------------------------
+    # Gradient Descent Line Search
+    # -------------------------
+    optimizer_ls = GradientDescentLineSearch(
+        optimal_tolerance=0,
+        max_evals=100,
+        verbose=False
+    )
+
+    model_ls = LinearModel(fun_obj, optimizer_ls)
+    model_ls.fit(X, y)
+
+    # Store objective values
+    ls_values = model_ls.fs
+
+    # -------------------------
+    # Plot learning curves
+    # -------------------------
+    iterations_gd = range(len(gd_values))
+    iterations_ls = range(len(ls_values))
+
+    plt.figure()
+
+    plt.plot(
+        iterations_gd,
+        gd_values,
+        label="GradientDescent"
+    )
+
+    plt.plot(
+        iterations_ls,
+        ls_values,
+        label="GradientDescentLineSearch"
+    )
+
+    plt.xlabel("Iteration")
+    plt.ylabel("Objective Function Value")
+    plt.title("Robust Regression: Optimizer Comparison")
+
+    plt.legend()
+
+    plt.savefig(
+        Path("..", "figs", "Robust_Regression_Optimizer_Comparison_Q2.4.2.pdf")
+    )
+
+    plt.close()
+\end{lstlisting}
+\end{answer}
 \ans{
 	{\centerfig{.61}{figs/Robust_Regression_Optimizer_Comparison_Q2.4.2.pdf}}
+\begin{center}
+\begin{tabular}{r|r|r}
+Iteration & Fixed-step GD objective & Line-search objective\\\hline
+0 & 2132.555438 & 2132.555438\\
+1 & 2107.394652 & 1644.520444\\
+5 & 2011.950541 & 1644.492663\\
+10 & 1905.470767 & 1644.492663\\
+100 & 1644.492835 & 1644.492663\\
+\end{tabular}
+\end{center}
 
-	According to the figure the GradientDescentLineSearch is the more iteration efficient optimizer
+	The line-search optimizer reaches the low objective region in fewer updates, so it is more iteration-efficient. The comparison uses 100 updates for each optimizer, includes the initial objective at iteration 0, and keeps the default fixed learning rate $10^{-3}$. Early stopping is disabled for this comparison. Iteration efficiency does not imply fewer function evaluations because line search may evaluate several trial steps.
 }
 
 
@@ -299,6 +420,8 @@ You will also explore how the complexity of a basis affects both the training er
 % In the final part of the question, it will be up to you to design a basis with better performance than polynomial bases.
 
 \subsection{Adding a Bias Variable \pts{8}}
+\par\textit{Source: OpenAI Codex assistance with derivation, implementation, and explanation (October 6, 2026); assignment data and starter code supplied by the course.}\par
+
 
 \label{biasvar}
 If you run \verb|python main.py 3|, it will:
@@ -331,7 +454,27 @@ Hint: recall that adding a bias $w_0$ is equivalent to adding a column of ones t
 
 
 
+\begin{answer}
+\begin{lstlisting}
+class LeastSquaresBias:
+    "Least Squares with a bias added"
+
+    def fit(self, X, y):
+        Z = np.column_stack((np.ones(X.shape[0]), X))
+        self.w = np.linalg.lstsq(Z, np.asarray(y).reshape(-1), rcond=None)[0]
+
+    def predict(self, X_pred):
+        Z = np.column_stack((np.ones(X_pred.shape[0]), X_pred))
+        return Z @ self.w
+\end{lstlisting}
+
+\centerfig{.7}{figs/least_squares_yes_bias.pdf}
+The fitted model is $\widehat y=78.712232+9.597789x$. Training MSE is $938.369$ and validation MSE is $844.378$, compared with $7107.2$ and $7085.6$ without a bias. The intercept improves the fit substantially, but the remaining error motivates a nonlinear basis.
+\end{answer}
+
 \subsection{Polynomial Basis \pts{10}}
+\par\textit{Source: OpenAI Codex assistance with derivation, implementation, and explanation (October 6, 2026); assignment data and starter code supplied by the course.}\par
+
 
 Adding a bias variable improves the prediction substantially, but the model is still problematic because the target seems to be a \emph{non-linear} function of the input.
 Complete \texttt{LeastSquarePoly} class, that takes a data vector $x$ (i.e., assuming we only have one feature) and the polynomial order $p$. The function should perform a least squares fit based on a matrix $Z$ where each of its rows contains the values $(x_{i})^j$ for $j=0$ up to $p$. E.g., \texttt{LeastSquaresPoly.fit(x,y)}  with $p = 3$ should form the matrix
@@ -355,35 +498,113 @@ Note: you should write the code yourself; don't use a library like sklearn's \te
 Note: in addition to the error curves, the code also produces a plot of the fits themselves. This is for your information; you don't have to submit it.
 
 
+\begin{answer}
+\begin{lstlisting}
+class LeastSquaresPoly:
+    "Least Squares with polynomial basis"
+
+    def __init__(self, p):
+        self.leastSquares = LeastSquares()
+        self.p = p
+
+    def fit(self, X, y):
+        Z = self._poly_basis(X)
+        self.w = np.linalg.lstsq(Z, np.asarray(y).reshape(-1), rcond=None)[0]
+
+    def predict(self, X_pred):
+        return self._poly_basis(X_pred) @ self.w
+
+    # A private helper function to transform any X with d=1 into
+    # the polynomial basis defined by this class at initialization.
+    # Returns the matrix Z that is the polynomial basis of X.
+    def _poly_basis(self, X):
+        x = np.asarray(X).reshape(-1)
+        return x[:, None] ** np.arange(self.p + 1)[None, :]
+\end{lstlisting}
+\begin{lstlisting}
+p_vals = [0, 1, 2, 3, 4, 5, 10, 20, 30, 50, 75, 100]
+err_trains, err_valids = [], []
+for p in p_vals:
+    model = LeastSquaresPoly(p)
+    model.fit(X, y)
+    err_trains.append(np.mean((model.predict(X) - y)**2))
+    err_valids.append(np.mean((model.predict(X_valid) - y_valid)**2))
+plt.plot(p_vals, err_trains, marker="o", label="Training MSE")
+plt.plot(p_vals, err_valids, marker="o", label="Validation MSE")
+plt.xlabel("Polynomial degree p")
+plt.ylabel("Mean squared error")
+plt.yscale("log")
+plt.legend()
+plt.savefig("../figs/polynomial_error_curves.pdf")
+\end{lstlisting}
+
+\centerfig{.8}{figs/polynomial_error_curves.pdf}
+\begin{center}
+\begin{tabular}{r|r|r}
+Degree $p$ & Training MSE & Validation MSE\\\hline
+0 & 3862.06 & 3594.01\\
+1 & 938.369 & 844.378\\
+2 & 598.711 & 618.364\\
+3 & 105.067 & 60.8836\\
+4 & 103.744 & 61.2340\\
+5 & 103.730 & 61.5202\\
+10 & 97.8467 & 69.2740\\
+20 & 4963.23 & 6248.39\\
+30 & 5656.20 & 14723.9\\
+50 & 6894.11 & 272057\\
+75 & 7558.90 & $1.50931\times10^6$\\
+100 & 7830.50 & $1.42898\times10^7$\\
+\end{tabular}
+\end{center}
+Degree 3 has the smallest validation MSE among the degrees tested in this run.
+In exact arithmetic, the minimum training error cannot increase when the degree increases, since each polynomial space contains the preceding one. Low degrees underfit; moderately larger degrees capture the nonlinear pattern. High degrees can overfit and worsen validation error. Raw monomial columns also become extremely ill-conditioned at large degrees, so numerical rank truncation can cause the computed training error to increase as well. The solver uses \texttt{lstsq}, avoiding the additional conditioning damage of forming normal equations, but it does not eliminate instability in the raw basis.
+\end{answer}
+
 \clearpage
 \section{Very-Short Answer Questions \pts{24}}
+\par\textit{Source: OpenAI Codex assistance with derivation, implementation, and explanation (October 6, 2026); assignment data and starter code supplied by the course.}\par
+
 
 \ask{Answer the following questions (in a sentence or two).}
 
 \begin{enumerate}
 \item Suppose that a training example is global outlier, meaning it is really far from all other data points. How is the cluster assignment of this example set by $k$-means? And how is it set by density-based clustering?
+\ans{$k$-means assigns the point to its nearest centroid, even if that centroid is far away; it can also pull a centroid toward itself. A density-based method such as DBSCAN labels it as noise if it has insufficient neighbors to be a core point and is not reachable from a core point.}
 
 \item Why do need random restarts for $k$-means but not for density-based clustering?
+\ans{$k$-means depends on its initial centroids and may converge to different local minima, so random restarts improve the chance of a good solution. Standard DBSCAN uses density connectivity rather than random initial centroids, so random restarts are unnecessary (although border assignments may depend on traversal order).}
 
 \item Can hierarchical clustering find non-convex clusters?
+\ans{Yes. Single-linkage hierarchical clustering can recover non-convex clusters by linking nearby points along their shapes, although it can suffer from chaining; other linkage rules need not recover these shapes.}
 
 \item For model-based outlier detection, list an example method and problem with identifying outliers using this method.
+\ans{Fit a Gaussian distribution and flag points with large Mahalanobis distance or low fitted density. If the data are multimodal or non-Gaussian, the assumed model can incorrectly flag ordinary observations; outliers can also distort the fitted parameters.}
 
 \item For graphical-based outlier detection, list an example method and problem with identifying outliers using this method.
+\ans{Use a boxplot and flag points beyond the interquartile-range fences. Skewed data can produce false positives, and inspecting each coordinate separately can miss multivariate outliers.}
 
 \item For supervised outlier detection, list an example method and problem with identifying outliers using this method.
+\ans{Train a binary classifier on labeled normal and anomalous examples. Anomalies are often rare and labels expensive, and the classifier may miss new types of anomalies absent from its training set.}
 
 \item If we want to do linear regression with 1 feature, explain why it would or would not make sense to use gradient descent to compute the least squares solution.
+\ans{With one feature, a closed-form least-squares solution is inexpensive, so gradient descent usually adds unnecessary iteration and step-size choices. It can still be useful for streaming data or very large datasets that favor incremental updates.}
 
 \item Why do we typically add a column of $1$ values to $X$ when we do linear regression? Should we do this if we're using decision trees?
+\ans{A column of ones provides an intercept, allowing nonzero predictions when the original features are zero. Decision trees already predict constants in their leaves, and a constant input cannot provide a useful split, so this column is unnecessary.}
 
 \item Why do we need gradient descent for the robust regression problem, as opposed to just using the normal equations? Hint: it is NOT because of the non-differentiability. Recall that we used gradient descent even after smoothing away the non-differentiable part of the loss.
+\ans{The robust gradient contains $\tanh(Xw-y)$, making the stationarity equation nonlinear in $w$. Normal equations solve the quadratic least-squares objective, whereas this smooth nonquadratic objective generally requires iterative optimization such as gradient descent.}
 
 \item What is the problem with having too small of a learning rate in gradient descent? What is the problem with having too large of a learning rate in gradient descent?
+\ans{A very small learning rate gives tiny updates and slow convergence. A very large learning rate can overshoot, oscillate, or diverge.}
 
 \item What is the purpose of the log-sum-exp function and how is this related to gradient descent?
+\ans{Log-sum-exp smoothly approximates a maximum; here $\log(e^r+e^{-r})$ approximates $\max(r,-r)=|r|$. Its differentiability supplies a usable gradient for gradient descent while retaining a robust, approximately absolute-value loss.}
 
 \item What type of non-linear transform might be suitable if we had a periodic function?
+
+\ans{A Fourier basis of sine and cosine terms is suitable, for example $\sin(2\pi kx/T)$ and $\cos(2\pi kx/T)$ for a period $T$ and several harmonics $k$.}
+
 \end{enumerate}
 
 \end{document}
