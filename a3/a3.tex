@@ -1,6 +1,4 @@
-% !TEX enableShellEscape = yes
-% (The above line makes atom's latex package compile with -shell-escape
-% for minted, and is just ignored by other systems.)
+% Compile from this directory (a3), using a PDF-capable LaTeX engine.
 \documentclass{article}
 
 \usepackage{fullpage}
@@ -10,16 +8,14 @@
 \usepackage{verbatim}
 \usepackage{graphicx}
 \usepackage{parskip}
-\usepackage{amssymb}
 \usepackage{hyperref}
 
-% Use one or the other of these for displaying code.
-% NOTE: If you get
-%  ! Package minted Error: You must invoke LaTeX with the -shell-escape flag.
-% and don't want to use minted, just comment out the next line
-\usepackage{minted} \BeforeBeginEnvironment{minted}{\begingroup\color{black}} \AfterEndEnvironment{minted}{\endgroup} \setminted{autogobble,breaklines,breakanywhere,linenos}
-
 \usepackage{listings}
+\lstset{language=Python,basicstyle=\ttfamily\small\color{black},
+  numbers=left,numberstyle=\tiny\color{black},breaklines=true,
+  columns=fullflexible,keepspaces=true,showstringspaces=false,tabsize=4}
+% Resolve figures when compiling from a3 or the repository root.
+\graphicspath{{./}{a3/}}
 
 % Colours
 \definecolor{blu}{rgb}{0,0,1}
@@ -74,11 +70,11 @@ Using our standard supervised learning notation ($X$, $y$, $w$)
 \ask{express the following functions in terms of vectors, matrices, and norms} (there should be no summations or maximums).
 \begin{enumerate}
 \item $\left(\sum_{i=1}^n |w^Tx_i - y_i|\right)^2$.
-\ans{||Xw - y||^2 1}
+\ans{$\lVert Xw - y\rVert_1^2$}
 \item $\sum_{i=1}^n v_i(w^Tx_i  - y_i)^2 + \frac{\lambda}{2}\sum_{j=1}^d w_j^2$. This is regularized least squares with a \emph{weight} $v_i$ for each training example:  Hint: You can use $V$ to denote a diagonal matrix that has the values $v_i$ along the diagonal. What does $a^T V b$ look like in summation form (for some arbitrary vectors $a$, $b$)?
-\ans{if r = Xw - y, then r^T VR, so the answer is (Xw-y)^T * V(Xw - y) + \lambda * w^T * w}
+\ans{if $r = Xw - y$, then $r^T VR$, so the answer is $(Xw-y)^T * V(Xw - y) + \lambda * w^T * w$}
 \item $\max_{i \in \{1,2,\dots,n\}}  |w^Tx_i - y_i| +  \frac12 \sum_{j=1}^{d} \lambda_j|w_j|$. This is L1-regularized brittle regression with a different regularization strength for each dimension: Hint: You can use  $\Lambda$ to denote a diagonal matrix that has the $\lambda_j$ values along the diagonal.
-\ans{||Xw-y||\infinity + 1/2||Aw||1}
+\ans{$\lVert Xw-y\rVert_\infty + 1/2\lVert Aw\rVert_1$}
 \end{enumerate}
 
 Note: you can assume that all the $v_i$ and $\lambda_i$ values are non-negative.
@@ -88,13 +84,13 @@ Note: you can assume that all the $v_i$ and $\lambda_i$ values are non-negative.
 \ask{Write finding a minimizer $w$ of the functions below as a system of linear equations} (using vector/matrix notation and simplifying as much as possible). Note that all the functions below are convex, so finding a $w$ with $\nabla f(w) = 0$ is sufficient to minimize the functions -- but show your work in getting to this point.
 
 \begin{enumerate}
-(Aw = b)
+\item[] $(Aw = b)$
 \item $f(w) = \frac{1}{2} \norm{w-v}^2$ (projection of $v$ onto real space).
-\ans{Iw = v}
+\ans{$Iw = v$}
 \item $f(w)= \frac{1}{2} \norm{Xw - y}^2 + \frac{1}{2} w^T\Lambda w$ (least squares with weighted regularization).
-\ans{X^T * Xw +Aw = X^T * y}
+\ans{$X^T * Xw +Aw = X^T * y$}
 \item $f(w) = \frac{1}{2} \sum_{i=1}^n v_i (w^Tx_i - y_i)^2 + \frac{\lambda}{2}\norm{w-w^{(0)}}^2$ (weighted least squares shrunk towards non-zero $w^{(0)}$). \label{item:weighted-shrunk-ls}
-\ans{(X^T * VX + \lambda * I)w = X^T * Vy + \lambda w^(0)}
+\ans{$(X^T * VX + \lambda * I)w = X^T * Vy + \lambda w^{(0)}$}
 \end{enumerate}
 Above we assume that $v$ and $w^{(0)}$ are $d \times 1$ vectors, and $\Lambda$ is a $d \times d$ diagonal matrix (with positive entries along the diagonal). You can use $V$ as a diagonal matrix containing the $v_i$ values along the diagonal.
 
@@ -149,8 +145,8 @@ Apply this model to the data containing outliers, setting $v = 1$ for the first
 $400$ data points and $v = 0.1$ for the last $100$ data points (which are the outliers).
 \ask{Hand in your code and the updated plot}.
 
-\ans{
-	\begin{minted}{python}
+\begin{answer}
+	\begin{lstlisting}
 		# Least squares where each sample point X has a weight associated with it.
 		class WeightedLeastSquares(LeastSquares):
     		# inherits the predict() function from LeastSquares
@@ -167,10 +163,10 @@ $400$ data points and $v = 0.1$ for the last $100$ data points (which are the ou
 
         		#solve weighted least squares
         		self.w = np.linalg.lstsq(weighted_X, weighted_y, rcond=None)[0]
-	\end{minted}
+	\end{lstlisting}
 
 	{\centerfig{.61}{figs/Weighted_least_squares_outliers_Q2.1.pdf}}
-}
+\end{answer}
 
 \subsection{Smooth Approximation to the L1-Norm \pts{8}}
 
@@ -191,7 +187,7 @@ which is smooth but less sensitive to outliers than the squared error. \ask{Deri
 
  FIN THIS ONE LATER
 \ans{for \[f(w) {=} \sum_{i=1}^n  \log\left(\exp(w^Tx_i - y_i) + \exp(y_i - w^Tx_i)\right).\]
-r_i = w^Tx_i - y_i , r_i- = y_i - w^Tx_i so for one term the equation becomes f_i(w) = log(exp(r_i) + exp(r_i-))
+$r_i = w^Tx_i - y_i$, $r_i^- = y_i - w^Tx_i$ so for one term the equation becomes $f_i(w) = \log(\exp(r_i) + \exp(r_i^-))$
 
 
 }
@@ -209,10 +205,10 @@ Look at the methods named \texttt{get\_learning\_rate\_and\_step()} and \texttt{
 	\ans{The varible that is equivalent to $\alpha^t$ in the step size at iteration $t$ is the varible $\alpha$}
 
 	\item Which variable is equivalent to $\nabla_w f(w^t)$ the current value of the gradient vector?
-	\ans{The varible that is equivalent to $\nabla_w f(w^t)$ in the current value of the gradient vector is the varible g_old}
+	\ans{The varible that is equivalent to $\nabla_w f(w^t)$ in the current value of the gradient vector is the varible \texttt{g\_old}}
 
 	\item Which variable is equivalent to $w^t$, the current value of the parameters?
-	\ans{The variable that is equivalent to $w^t$, within the current value of the parameters is w_old}
+	\ans{The variable that is equivalent to $w^t$, within the current value of the parameters is \texttt{w\_old}}
 
 	\item What is the method \texttt{break\_yes()} doing?
 	\ans{The method \texttt{break\_yes()} is checking whether the gradient is small enought to meet the optimality tolerance, weather the maximum num of evaluations is reached.
@@ -245,8 +241,8 @@ Optimizing robust regression parameters is the matter of implementing a function
 approximation to the absolute value function (from the previous section). Hand in your code, as well
 as the plot obtained using this robust regression approach.}
 
-\ans{
-	\begin{minted}{python}
+\begin{answer}
+	\begin{lstlisting}
 		class RobustRegressionLoss(FunObj):
     		def evaluate(self, w, X, y):
         		"""
@@ -270,10 +266,10 @@ as the plot obtained using this robust regression approach.}
         		gradient = X.T & np.tanh(resid)
 
         		return f_sum, gradient
-	\end{minted}
+	\end{lstlisting}
 
-	{\centerfig{.61}{figs/Robust_Regression_Loss_Q2.4.pdf}}
-}
+	{\centerfig{.61}{figs/Robust_Regression_GradientDescent_Q2.4.pdf}}
+\end{answer}
 
 
 \subsubsection{The Learning Curves \pts{5}}
@@ -326,7 +322,7 @@ instead of
 \[
 y_i = w^Tx_i.
 \]
-\ask{In file \texttt{linear\string_models.py}, complete the class \texttt{LeastSquaresBias},
+\ask{In file \texttt{linear\_models.py}, complete the class \texttt{LeastSquaresBias},
 that has the same input/model/predict format as the \texttt{LeastSquares} class,
 but that adds a \emph{bias} variable (also called an intercept) $w_0$ (also called $\beta$ in lecture). Hand in your new class, the updated plot,
 and the updated training/validation error.}
